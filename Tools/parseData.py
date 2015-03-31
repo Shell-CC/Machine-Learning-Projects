@@ -1,12 +1,11 @@
 
-import numpy as np
-
-# Read from a text file and parse as a list
-# read each line as a train data
-# Split each line by a 'splitter', like ' ' or '\t'
-# label is the 'yColNum' column, others are datas
-# if 'yColNum' is 0, no labels
 def textAsMat(filename, yColNum, splitter=' '):
+    """Read from a text file and parse as a list
+    read each line as a train data
+    Split each line by a 'splitter', like ' ' or '\t'
+    label is the 'yColNum' column, others are datas
+    if 'yColNum' is 0, no labels
+    """
     X = []; y = []
     f = open(filename, 'rU')
     for line in f:
@@ -19,4 +18,4 @@ def textAsMat(filename, yColNum, splitter=' '):
             y.append(label)
             X.append(data)
     f.close
-    return np.mat(X), np.mat(y)
+    return X, y
