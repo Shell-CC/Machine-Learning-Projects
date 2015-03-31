@@ -97,8 +97,10 @@ def gradientDescent(Xtrain, ytrain, alpha=0.001, N=10000, debug=False):
     return weights
 
 def main():
-    Xtrain, ytrain = pd.textAsMat('../testData/testLogicRegres', 1, '\t')
-    Xtest, ytest = pd.textAsMat('../testData/testLogicRegres2', 1, '\t')
+    Xtrain, ytrain = pd.textAsMat('../testData/bclass-train', 1, '\t')
+    Xtest, ytest = pd.textAsMat('../testData/bclass-test', 1, '\t')
+    ytrain = np.mat(ytrain)
+    ytest = np.mat(ytest)
     ytrain = (np.ones((ytrain.shape[0],1)) + ytrain)/2
     ytest = (np.ones((ytest.shape[0],1)) + ytest)/2
     weights = train(Xtrain, ytrain, 0.01);
