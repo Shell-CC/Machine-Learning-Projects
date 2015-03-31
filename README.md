@@ -1,17 +1,22 @@
 # Machine-Learning-Projects
+## Introduction
 Implementation of basic ML models and some demo applications
-
+## Tools
+implementaion of basic and most popular machine learning models, including:
++ Classifier
+- k nearest neighbors
+- logistic regression
++ Predictor
+- linear regression
+## Structure of the documents
 \Tool
-  # implementaion of basic and most popular machine learning models
   __init__.py
   parseData.py
-    # read data from files
   \testData
   \Classifier
     __init__.py
-    kNN.py            # k nearest neighbors classifier
-    nb.py             # naive Bayes classifier
-    logicRegres.py    # logistic regression classifier
+    kNN.py
+    logicRegres.py
   \Predictor
-    __init__.py       
-    LinearRegress.py  # linear regression
+    __init__.py  
+    LinearRegress.py
