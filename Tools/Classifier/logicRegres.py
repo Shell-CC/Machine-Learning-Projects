@@ -1,35 +1,85 @@
 #!/usr/bin/env python
-
-'''This is the implementation of the linear regression with multiple variables
-'''
+"""This is the implementation of the logic regression with multiple variables
+"""
 import numpy as np
 import parseData as pd
 import matplotlib.pyplot as plt
 
-def sigmoid(inX):
-    return 1/(1+np.exp(-inX))
-
-def gradientDescentTrain(Xtrain, ytrain, alpha=0.001, N = 3000, debug=False):
-    '''Train the weights using 'gradient descent'
-    Gradient descent can converge to a local minimal of the cost function
-    The cost function of logic regression is the euclidian distance of Xw and y
+def train(Xtrain, ytrain, alpha):
+    """Train the weights using 'gradient descent'
 
     parameters
     -----------
     Xtrain: array_like features as train data, x
     ytrain: array_like labels as train data, y
-    alpha:  the learning rate (step length), the default is 0.001
-    N:      the number of iterations
+    alpha:  the learning rate (step length) of gradient descent
 
     Returns
     -------
     weights: weights of features, w
-    '''
-
-    # change type to mat, add x_0 = 1
+    """
+    # change X, y type to mat, add x_0 = 1 to X
     Xtrain = np.mat(Xtrain)
     Xtrain = np.concatenate((np.ones((Xtrain.shape[0], 1)), Xtrain), axis=1)
     ytrain = np.mat(ytrain)
+    # using gradient descent
+    weights = gradientDescent(Xtrain, ytrain, alpha);
+    return weights
+
+def classify(X, weights):
+    """Classify the data X using logic regression using the weights
+    yhat = 1 / (1 + exp(-w.*X))
+
+    parameters
+    ----------
+    X:       array_like features as input data
+    weights: weights of the features from train data
+
+    returns
+    -------
+    yhat:    the predicted labels of the data.
+    """
+    # change X type to mat, add x_0 = 1 to X
+    X = np.mat(X)
+    X = np.concatenate((np.ones((X.shape[0], 1)), X), axis=1)
+    # predict yhat using regression
+    yhat = sigmoid(X * weights)
+    yhat = np.round(yhat)
+    return yhat
+
+def test(Xtest, ytest, weights):
+    """Test the logic regression classifier using the data with labels
+    yhat = 1 / (1 + exp(-w.*X))
+
+    parameters
+    ----------
+    Xtest:   array_like features as the input data
+    ytest:   array_like labels as the input label
+    weights: weights of the features from train data
+
+    returns
+    -------
+    print:   the misclassificaiton error of the data set
+    yhat:    the predicted labels of the data.
+    """
+    # change y type to mat
+    ytest = np.mat(ytest)
+    # predict yhat and calaulate misclassification error
+    yhat = classify(Xtest, weights)
+    error = np.absolute(yhat-ytest).sum()
+    errorRate = np.absolute(yhat-ytest).mean()
+    print 'error: %d/%d=%.2f%%' % (error, len(yhat), errorRate*100)
+    return yhat
+
+def sigmoid(inX):
+    return 1/(1+np.exp(-inX))
+
+def gradientDescent(Xtrain, ytrain, alpha=0.001, N=10000, debug=False):
+    '''Train the weights using 'gradient descent'
+    Gradient descent can converge to a local minimal of the cost function
+    The cost function of logic regression is the euclidian distance of Xw and y
+    '''
+
     # start with the weights all set to 1
     weights = np.ones((Xtrain.shape[1],1))
     # calculate gradians N times
@@ -46,31 +96,14 @@ def gradientDescentTrain(Xtrain, ytrain, alpha=0.001, N = 3000, debug=False):
         plt.show()
     return weights
 
-def classify(X, weights):
-    # change type to mat, add x_0 = 1
-    X = np.mat(X)
-    X = np.concatenate((np.ones((X.shape[0], 1)), X), axis=1)
-    yhat = sigmoid(X * weights)
-    yhat = np.round(yhat)
-    return yhat
-
-def test(Xtest, ytest, weights):
-    ytest = np.mat(ytest)
-    yhat = classify(Xtest, weights)
-    error = np.absolute(yhat-ytest).sum()
-    errorRate = np.absolute(yhat-ytest).mean()
-    return yhat, error, errorRate
-
 def main():
     Xtrain, ytrain = pd.textAsMat('../testData/testLogicRegres', 1, '\t')
     Xtest, ytest = pd.textAsMat('../testData/testLogicRegres2', 1, '\t')
     ytrain = (np.ones((ytrain.shape[0],1)) + ytrain)/2
     ytest = (np.ones((ytest.shape[0],1)) + ytest)/2
-    weights = gradientDescentTrain(Xtrain, ytrain, 0.01, 300000)
-    yhat, error, errorRate = test(Xtrain, ytrain, weights)
-    print error, errorRate
-    yhat, error, errorRate = test(Xtest, ytest, weights)
-    print error, errorRate
+    weights = train(Xtrain, ytrain, 0.01);
+    test(Xtrain, ytrain, weights)
+    test(Xtest, ytest, weights)
 
 
 if __name__ == '__main__':
