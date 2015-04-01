@@ -1,20 +1,57 @@
 
-def textAsMat(filename, yColNum, splitter=' '):
-    """Read from a text file and parse as a list
-    read each line as a train data
-    Split each line by a 'splitter', like ' ' or '\t'
-    label is the 'yColNum' column, others are datas
-    if 'yColNum' is 0, no labels
+def textAsString(filename, axis, splitter=' '):
+    """Read from a text file and parse each train data as a list of string
+
+    parameters
+    ----------
+    filename:  path of the file
+    axis:      indicates which feature is the label, while others are datas
+               if axis is 0, no labels
+    Splitter:  Split each line, ex., ' ' or '\t'
+
+    Returns
+    -------
+    X:  a list of features of the data
+    y:  a list of labels of the data, [] if does not exist
+    """
+    X = []; y = []
+    f = open(filename, 'rU')
+    for line in f:
+        line = line.rstrip('\n')
+        data = line.split(splitter)
+        if axis == 0:
+            X.append(data)
+        else:
+            label = [data.pop(axis-1)]
+            y.append(label)
+            X.append(data)
+    f.close
+    return X, y
+
+def textAsFloat(filename, axis, splitter=' '):
+    """Read from a text file and parse each train data as a list of float data
+
+    parameters
+    ----------
+    filename:  path of the file
+    axis:      indicates which feature is the label, while others are datas
+               if axis is 0, no labels
+    Splitter:  Split each line, ex., ' ' or '\t'
+
+    Returns
+    -------
+    X:  a list of features of the data
+    y:  a list of labels of the data, [] if does not exist
     """
     X = []; y = []
     f = open(filename, 'rU')
     for line in f:
         line = line.rstrip('\n')
         data = map(float, line.split(splitter))
-        if yColNum == 0:
+        if axis == 0:
             X.append(data)
         else:
-            label = [data.pop(yColNum-1)]
+            label = [data.pop(axis-1)]
             y.append(label)
             X.append(data)
     f.close
