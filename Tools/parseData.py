@@ -22,7 +22,7 @@ def textAsString(filename, axis, splitter=' '):
         if axis == 0:
             X.append(data)
         else:
-            label = [data.pop(axis-1)]
+            label = [data.pop(axis)]
             y.append(label)
             X.append(data)
     f.close
@@ -51,7 +51,7 @@ def textAsFloat(filename, axis, splitter=' '):
         if axis == 0:
             X.append(data)
         else:
-            label = [data.pop(axis-1)]
+            label = [data.pop(axis)]
             y.append(label)
             X.append(data)
     f.close
