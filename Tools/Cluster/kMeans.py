@@ -3,8 +3,11 @@
 """This is the implementation of k-means algorithm
 """
 
+import parseData as pd
+
 def main():
-    pass
+    X = pd.textAsFloat('../testData/testKMeans.txt', None, '\t')
+    print X
 
 if __name__ == '__main__':
     main()
