@@ -81,8 +81,8 @@ def kNN(Xtrain, ytrain, Xtest, k):
     return yhat
 
 def main():
-    Xtrain, ytrain = pd.textAsFloat('../testData/bclass-train', 1, '\t')
-    Xtest, ytest = pd.textAsFloat('../testData/bclass-test', 1, '\t')
+    Xtrain, ytrain = pd.textAsFloat('../testData/bclass-train', 0, '\t')
+    Xtest, ytest = pd.textAsFloat('../testData/bclass-test', 0, '\t')
     model = train(Xtrain, ytrain, 3)
     test(Xtrain, ytrain, model)
     test(Xtest, ytest, model)

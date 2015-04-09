@@ -19,7 +19,7 @@ def textAsString(filename, axis, splitter=' '):
     for line in f:
         line = line.rstrip('\n')
         data = line.split(splitter)
-        if axis == 0:
+        if axis == None:
             X.append(data)
         else:
             label = [data.pop(axis)]
@@ -48,7 +48,7 @@ def textAsFloat(filename, axis, splitter=' '):
     for line in f:
         line = line.rstrip('\n')
         data = map(float, line.split(splitter))
-        if axis == 0:
+        if axis == None:
             X.append(data)
         else:
             label = [data.pop(axis)]
