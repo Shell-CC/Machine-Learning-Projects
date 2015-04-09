@@ -26,7 +26,10 @@ def textAsString(filename, axis, splitter=' '):
             y.append(label)
             X.append(data)
     f.close
-    return X, y
+    if axis == None:
+        return X
+    else:
+        return X, y
 
 def textAsFloat(filename, axis, splitter=' '):
     """Read from a text file and parse each train data as a list of float data
@@ -55,4 +58,7 @@ def textAsFloat(filename, axis, splitter=' '):
             y.append(label)
             X.append(data)
     f.close
-    return X, y
+    if axis==None:
+        return X
+    else:
+        return X,y

@@ -122,12 +122,10 @@ def split(dataset, axis, value):
     return subDataset
 
 def main():
-    dataset, none = pd.textAsString('../testData/playGolf', None, '\t')
+    dataset= pd.textAsString('../testData/playGolf', None, '\t')
     featName = ['Outlook', 'Temperature', 'Humidity', 'Wind']
-    testdata, y = pd.textAsString('../testData/playGolf', -1, '\t')
     tree = train(dataset, featName)
     print 'Decision tree:', tree
-    test(testdata, y, featName, tree)
 
 if __name__ == '__main__':
         main()
