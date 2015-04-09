@@ -23,7 +23,7 @@ def train(Xtrain, ytrain):
     Xtrain = np.mat(Xtrain)
     # Xtrain = np.concatenate((np.ones((Xtrain.shape[0], 1)), Xtrain), axis=1)
     ytrain = np.mat(ytrain)
-    alphaList, b = simpleSMO(Xtrain, ytrain, 0.6, 0.0001, 40)
+    alphaList, b = simpleSMO(Xtrain, ytrain, 0.6, 0.001, 40)
     return alphaList, b
 
 def classify():
@@ -68,15 +68,15 @@ def simpleSMO(Xtrain, ytrain, C, toler, N=10000):
                 alphaJold = alphaList[j].copy()
                 alphaIold = alphaList[i].copy()
                 # update alpha j
-                alphaList[j] -= ytrain[j]*(Ej- Ei) / eta
+                alphaList[j] -= ytrain[j]*(Ei- Ej) / eta
                 if alphaList[j]>H:
                     alphaList[j] = H
                 elif alphaList[j]<L:
                     alphaList[j] = L
-                if (abs(alphaList[j]-alphaJold)<0.00005):
+                if (abs(alphaList[j]-alphaJold)<0.00001):
                     continue
                 # update alpha i
-                alphaList[i] += ytrain[i]*ytrain[j]*(alphaIold-alphaList[i])
+                alphaList[i] += ytrain[j]*ytrain[i]*(alphaJold-alphaList[j])
                 # compute the b threshold
                 b1 = b - Ei- \
                      ytrain[i]*(alphaList[i]-alphaIold)*Xtrain[i,:]*Xtrain[i,:].T\
@@ -95,14 +95,14 @@ def simpleSMO(Xtrain, ytrain, C, toler, N=10000):
             iter += 1
         else:
             iter = 0
-        print 'iter number: %d' % iter
+        # print 'iter number: %d' % iter
     return alphaList, b
 
 def selectJ(i, m):
     # randomly select alpha j not equal to alpha i
     j = i
     while (j==i):
-        j = randint(0,m)
+        j = randint(0,m-1)
     return j
 
 def main():
@@ -111,7 +111,7 @@ def main():
     Xtrain, ytrain = pd.textAsFloat('../testData/testSMO.txt', -1, '\t')
     alphas, b = train(Xtrain, ytrain)
     print b
-    print alphas
+    print alphas[alphas>0]
 
 if __name__ == '__main__':
     main()
