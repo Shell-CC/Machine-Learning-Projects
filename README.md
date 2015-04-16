@@ -11,3 +11,7 @@ implementaion of basic and most popular machine learning models, including:
 
 *Predictor*  
 + linear regression: normal equation  
+
+*Pre-processor*  
++ standardization  
++ normalization  
