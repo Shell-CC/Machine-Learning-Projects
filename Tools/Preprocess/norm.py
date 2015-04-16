@@ -14,7 +14,7 @@ def standardize(dataset, removeMean=True, scale=True):
 
     returns
     -------
-    dataset:   the standardized given dataset
+    dataset:    the standardized given dataset
     """
     dataset = np.mat(dataset)
     if removeMean:
@@ -29,11 +29,37 @@ def standardize(dataset, removeMean=True, scale=True):
             dataset /= stdVec
     return dataset
 
+def normalize(dataset, norm='l2'):
+    """Normalize the dataset to unit scale
+
+    parameters
+    ----------
+    dataset:   the given dataset
+    norm:      if 'l1', L1/Mahanttan norm; if 'l2', L2/Euclidean norm.
+
+    returns
+    -------
+    dataset:   the normalized dataset
+    """
+    dataset = np.mat(dataset)
+    if norm=='l1':
+        norms = np.abs(dataset).sum(axis=0)
+        norms[norms==0] = 1
+    elif norm=='l2':
+        norms = np.sqrt(np.multiply(dataset, dataset).sum(axis=0))
+        norms[norms==0] = 1
+    else:
+        print 'input l1 or l2'
+        return None
+    dataset /= norms
+    return dataset
+
 def main():
     X = [[1., 3., 2.],
          [1., 4., -1.],
          [1., 5., 0.]]
     print standardize(X)
+    print normalize(X)
 
 if __name__ == '__main__':
     main()
