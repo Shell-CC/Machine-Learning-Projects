@@ -14,4 +14,4 @@ implementaion of basic and most popular machine learning models, including:
 
 *Pre-processor*  
 + standardization  
-+ normalization  
++ normalization: L1 norm, L2 norm  
