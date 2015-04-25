@@ -25,6 +25,17 @@ def model(A, B, pi=[]):
     return (A,B,pi)
 
 def likelihood(observ, theta):
+    """ Calculate the likelihood of the observed sequence using forward algorithm
+
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+
+    returns
+    -------
+    likelihood: the probability of the observation
+    """
     alpha = forward(theta, observ)
     likelihood = alpha.sum(axis=0)
     return np.asarray(likelihood)[0][0]
