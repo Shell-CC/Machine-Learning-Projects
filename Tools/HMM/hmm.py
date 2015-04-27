@@ -13,15 +13,15 @@ def model(A, B, pi=[]):
 
     returns
     -------
-    theta: the parameters in matrix theta = (A, B, pi).If unknown, default by uniform distribution
+    theta: the parameters in array theta = (A, B, pi).If unknown, default by uniform distribution
     """
-    A = np.mat(A)
-    B = np.mat(B)
+    A = np.asarray(A)
+    B = np.asarray(B)
     if len(pi)==0:
         stateNum = A.shape[0]
-        pi = np.ones((stateNum,1))/stateNum
+        pi = np.ones(stateNum)/stateNum
     else:
-        pi = np.mat(pi)
+        pi = np.asarray(pi)
     return (A,B,pi)
 
 def likelihood(observ, theta):
@@ -36,9 +36,9 @@ def likelihood(observ, theta):
     -------
     likelihood: the probability of the observation
     """
-    alpha = forward(theta, observ)
-    likelihood = alpha.sum(axis=0)
-    return np.asarray(likelihood)[0][0]
+    alpha = forward(theta, observ)[-1]
+    likelihood = alpha.sum()
+    return likelihood
 
 def forward(theta, observ):
     """ implement forward algorithm (alpha-recursion)
@@ -57,27 +57,59 @@ def forward(theta, observ):
     pi = theta[2]
     t = len(observ)
     observ = np.asarray(observ) - 1
-    alpha = np.multiply(pi, B[:,observ[0]])
+    alphas = np.zeros((t, A.shape[0]))
+    alphas[0] = pi * B[:,observ[0]]
     for i in range(1,t):
-        # print alpha
-        alpha = np.multiply(A.T*alpha, B[:,observ[i]])
-    return alpha
+        alphas[i] = np.dot(alphas[i-1], A) * B[:,observ[i]]
+    return alphas
+
+def backward(theta, observ):
+    """ implement forward algorithm (alpha-recursion)
+
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+
+    returns
+    -------
+    prob: the joint probability the observation and the present hidden state.
+    """
+    A = theta[0]
+    B = theta[1]
+    t = len(observ)
+    observ = np.asarray(observ) - 1
+    betas = np.zeros((t, A.shape[0]))
+    betas[t-1] = np.ones(A.shape[0])
+    for i in range(t-2,-1,-1):
+        # print np.transpose(A)
+        betas[i] = np.dot(betas[i+1]*B[:,observ[i+1]], np.transpose(A))
+    return betas
 
 def main():
-    A = [[0.0, 0.3, 0.4, 0.3],
-         [0.0, 0.8, 0.1, 0.1],
-         [0.0, 0.3, 0.6, 0.1],
-         [0.0, 0.1, 0.2, 0.7]]
-    B = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-         [0.5, 0.2, 0.1, 0.1, 0.05, 0.05],
-         [0.05, 0.05, 0.45, 0.05, 0.35, 0.05],
-         [0.25, 0.05, 0.05, 0.05, 0.05, 0.55]]
-    observ = [3, 2, 1, 2, 2, 6, 5]
-    theta = model(A,B)
+    # A = [[0.0, 0.3, 0.4, 0.3],
+         # [0.0, 0.8, 0.1, 0.1],
+         # [0.0, 0.3, 0.6, 0.1],
+         # [0.0, 0.1, 0.2, 0.7]]
+    # B = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+         # [0.5, 0.2, 0.1, 0.1, 0.05, 0.05],
+         # [0.05, 0.05, 0.45, 0.05, 0.35, 0.05],
+         # [0.25, 0.05, 0.05, 0.05, 0.05, 0.55]]
+    # observ = [3, 2, 1, 2, 2, 6, 5]
+    A = [[0.5, 0.3, 0.2],
+         [0.0, 0.6, 0.4],
+         [0.0, 0.0, 1.0]]
+    B = [[0.7, 0.3],
+         [0.4, 0.6],
+         [0.8, 0.2]]
+    observ = [1,2,1]
+    pi = [0.9, 0.1, 0.0]
+    theta = model(A,B,pi)
     for i in theta:
         print i
     print forward(theta, observ)
     print likelihood(observ, theta)
+    print backward(theta, observ)
 
 if __name__ == '__main__':
     main()
