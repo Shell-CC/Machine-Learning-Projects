@@ -40,6 +40,11 @@ def likelihood(observ, theta):
     likelihood = alpha.sum()
     return likelihood
 
+def filtering(observ, theta):
+    alpha = forward(theta, observ)[-1]
+    present = alpha / alpha.sum()
+    return present
+
 def forward(theta, observ):
     """ implement forward algorithm (alpha-recursion)
 
@@ -86,6 +91,16 @@ def backward(theta, observ):
         betas[i] = np.dot(betas[i+1]*B[:,observ[i+1]], np.transpose(A))
     return betas
 
+def veterbi(theta, observ):
+    return None
+
+def greedy(theta, observ):
+    # This is the greedy searching of the most likelihood hidden path.
+    # Just for comparision porpose, not suggested to be used.
+    A = theta[0]
+    B = theta[1]
+    return None
+
 def main():
     # A = [[0.0, 0.3, 0.4, 0.3],
          # [0.0, 0.8, 0.1, 0.1],
@@ -108,8 +123,12 @@ def main():
     for i in theta:
         print i
     print forward(theta, observ)
-    print likelihood(observ, theta)
     print backward(theta, observ)
+
+    print '-> Probability of the observed sequence is:'
+    print likelihood(observ, theta)
+    print '-> Infer the present: the probability of the present hidden state is:'
+    print filtering(observ, theta)
 
 if __name__ == '__main__':
     main()
