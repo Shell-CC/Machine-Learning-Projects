@@ -118,8 +118,25 @@ def backward(theta, observ, t=0):
         betas[i] = np.dot(betas[i+1]*B[:,observ[i+1]], np.transpose(A))
     return betas
 
-def veterbi(theta, observ):
-    return None
+def viterbi(theta, observ):
+    A = theta[0]
+    B = theta[1]
+    pi = theta[2]
+    t = len(observ)
+    observ = np.asarray(observ) - 1
+
+    argmaxMu = np.zeros((t, A.shape[0]))
+    delta = pi * B[:, observ[0]]
+    for i in range(1,t):
+        mu = np.transpose(A) * np.tile(delta, (3,1))
+        delta = B[:,observ[i]] * np.amax(mu, axis=1)
+        argmaxMu[i] = np.argmax(mu, axis=1)
+
+    omegas = [0]*t
+    omegas[t-1] = (int)(np.argmax(delta))
+    for i in range(t-2, -1, -1):
+        omegas[i] = (int)(argmaxMu[i+1][omegas[i+1]])
+    return omegas
 
 def greedy(theta, observ, t=None):
     """ Find the most likely hidden path using greedy algorithm,
@@ -163,6 +180,11 @@ def main():
     print '-> Infer the past: the probability of the past hidden state is:'
     for i in range(len(observ)-1):
         print i, smoothing(observ, theta, i)
+    print '-> Most likely hidden path is: '
+    path = viterbi(theta, observ)
+    for i in path:
+        print 'h%d->' % i,
+    print '\b\b\b'
 
 if __name__ == '__main__':
     main()
