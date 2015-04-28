@@ -15,3 +15,7 @@ implementaion of basic and most popular machine learning models, including:
 *Pre-processor*  
 + standardization  
 + normalization: L1 norm, L2 norm  
+
+*HMM*  
++ Probability estimation: forward-backward algorithm  
++ Optiaml hidden path: Viterbi algorithm  
