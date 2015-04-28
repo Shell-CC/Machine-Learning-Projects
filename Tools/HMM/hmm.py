@@ -40,6 +40,20 @@ def likelihood(observ, theta):
     likelihood = alpha.sum()
     return likelihood
 
+def optimalPath(observ, theta):
+    """ implement Viterbi algorithm
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+
+    returns
+    -------
+    path: the most likely hidden path list
+    """
+    path = viterbi(theta, observ)
+    return path
+
 def filtering(observ, theta):
     """ Infer the present hidden state
 
@@ -167,18 +181,17 @@ def viterbi(theta, observ):
     for i in range(t-2, -1, -1):
         omegas[i] = (int)(argmaxMu[i+1][omegas[i+1]])
         omegas[i+1] += 1
+    omegas[0] += 1
     return omegas
 
-def greedy(theta, observ, t=None):
+def greedy(theta, observ):
     """ Find the most likely hidden path using greedy algorithm,
         by finding the most likely hidden state each time.
         This is not the most likely hidden path, not consist with Viterbi
     """
-    alphas = forward(theta, observ)
-    likeli = alphas[-1].sum()
-    betas = backward(theta, observ,t)
-    gammas = alphas * betas / likeli
-    return gammas
+    gammas = forwardBackward(theta, observ)
+    path = np.argmax(gammas, axis=1) + 1
+    return path.tolist()
 
 def main():
     # A = [[0.0, 0.3, 0.4, 0.3],
@@ -211,11 +224,12 @@ def main():
     print '-> Infer the past: the probability of the past hidden state is:'
     for i in range(len(observ)-1):
         print i, smoothing(observ, theta, i)
-    print '-> Most likely hidden path is: '
-    path = viterbi(theta, observ)
+    print '-> Most likely hidden path (using Viterbi) is: '
+    path = optimalPath(observ, theta)
     for i in path:
         print 'h%d->' % i,
     print '\b\b\b'
+    print greedy(theta, observ)
 
 if __name__ == '__main__':
     main()
