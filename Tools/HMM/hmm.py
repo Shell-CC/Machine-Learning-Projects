@@ -41,9 +41,36 @@ def likelihood(observ, theta):
     return likelihood
 
 def filtering(observ, theta):
+    """ Infer the present hidden state
+
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+
+    returns
+    -------
+    present: the conditional probability of the present hidden state given observation
+    """
     alpha = forward(theta, observ)[-1]
     present = alpha / alpha.sum()
     return present
+
+def smoothing(observ, theta, t):
+    """ Infer the past hidden state at time t
+
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+    t:      time t in the sequence,  0<=t<=total time
+
+    returns
+    -------
+    present: the conditional probability of the hidden state at t given observation
+    """
+    gammas = greedy(theta, observ, t)
+    return gammas[t]
 
 def forward(theta, observ):
     """ implement forward algorithm (alpha-recursion)
@@ -68,7 +95,7 @@ def forward(theta, observ):
         alphas[i] = np.dot(alphas[i-1], A) * B[:,observ[i]]
     return alphas
 
-def backward(theta, observ):
+def backward(theta, observ, t=0):
     """ implement forward algorithm (alpha-recursion)
 
     parameters
@@ -82,11 +109,11 @@ def backward(theta, observ):
     """
     A = theta[0]
     B = theta[1]
-    t = len(observ)
+    total = len(observ)
     observ = np.asarray(observ) - 1
-    betas = np.zeros((t, A.shape[0]))
-    betas[t-1] = np.ones(A.shape[0])
-    for i in range(t-2,-1,-1):
+    betas = np.zeros((total, A.shape[0]))
+    betas[total-1] = np.ones(A.shape[0])
+    for i in range(total-2,t-1,-1):
         # print np.transpose(A)
         betas[i] = np.dot(betas[i+1]*B[:,observ[i+1]], np.transpose(A))
     return betas
@@ -94,12 +121,16 @@ def backward(theta, observ):
 def veterbi(theta, observ):
     return None
 
-def greedy(theta, observ):
-    # This is the greedy searching of the most likelihood hidden path.
-    # Just for comparision porpose, not suggested to be used.
-    A = theta[0]
-    B = theta[1]
-    return None
+def greedy(theta, observ, t=None):
+    """ Find the most likely hidden path using greedy algorithm,
+        by finding the most likely hidden state each time.
+        This is not the most likely hidden path, not consist with Viterbi
+    """
+    alphas = forward(theta, observ)
+    likeli = alphas[-1].sum()
+    betas = backward(theta, observ,t)
+    gammas = alphas * betas / likeli
+    return gammas
 
 def main():
     # A = [[0.0, 0.3, 0.4, 0.3],
@@ -129,6 +160,9 @@ def main():
     print likelihood(observ, theta)
     print '-> Infer the present: the probability of the present hidden state is:'
     print filtering(observ, theta)
+    print '-> Infer the past: the probability of the past hidden state is:'
+    for i in range(len(observ)-1):
+        print i, smoothing(observ, theta, i)
 
 if __name__ == '__main__':
     main()
