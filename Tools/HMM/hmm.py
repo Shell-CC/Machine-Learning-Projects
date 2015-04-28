@@ -69,7 +69,7 @@ def smoothing(observ, theta, t):
     -------
     present: the conditional probability of the hidden state at t given observation
     """
-    gammas = greedy(theta, observ, t)
+    gammas = forwardBackward(theta, observ, t)
     return gammas[t]
 
 def forward(theta, observ):
@@ -102,6 +102,7 @@ def backward(theta, observ, t=0):
     ----------
     theta:  (trasition matrix, emission matrix, initial state)
     observ: the observed sequence
+    t:      time t in the sequence,  0<=t<=total time
 
     returns
     -------
@@ -118,7 +119,36 @@ def backward(theta, observ, t=0):
         betas[i] = np.dot(betas[i+1]*B[:,observ[i+1]], np.transpose(A))
     return betas
 
+def forwardBackward(theta, observ, t=0):
+    """ implememt forward-backward algorithm
+
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+    t:      time t in the sequence,  0<=t<=total time
+
+    returns
+    -------
+    gammas: the conditional probability distribution of hidden path after t.
+    """
+    alphas = forward(theta, observ)
+    likeli = alphas[-1].sum()
+    betas = backward(theta, observ,t)
+    gammas = alphas * betas / likeli
+    return gammas
+
 def viterbi(theta, observ):
+    """ implement Viterbi algorithm
+    parameters
+    ----------
+    theta:  (trasition matrix, emission matrix, initial state)
+    observ: the observed sequence
+
+    returns
+    -------
+    omegas: the most likely hidden path list
+    """
     A = theta[0]
     B = theta[1]
     pi = theta[2]
@@ -136,6 +166,7 @@ def viterbi(theta, observ):
     omegas[t-1] = (int)(np.argmax(delta))
     for i in range(t-2, -1, -1):
         omegas[i] = (int)(argmaxMu[i+1][omegas[i+1]])
+        omegas[i+1] += 1
     return omegas
 
 def greedy(theta, observ, t=None):
