@@ -193,6 +193,41 @@ def greedy(theta, observ):
     path = np.argmax(gammas, axis=1) + 1
     return path.tolist()
 
+def BaumWelch(observ, M, N):
+    # initialize theta
+    # A = np.ones((M,M))/M
+    # B = np.ones((M,N))/N
+    # pi = np.ones(M)/M
+    A = [[0.5, 0.5],
+         [0.3, 0.7]]
+    B = [[0.3, 0.7],
+         [0.8, 0.2]]
+    pi = [0.2, 0.8]
+    (A,B,pi) = model(A,B,pi)
+    t = len(observ)
+    for k in range(1000):
+        # E-step
+        gammas = forwardBackward((A,B,pi), observ)
+        epsilons = np.zeros((t-1,M,M))
+        for i in range(t-1):
+            a = np.mat(gammas[i])
+            b = np.mat(gammas[i+1])
+            epsilons[i] = np.asarray(a.T * b)
+        # M-step
+        pi = gammas[0]
+        den = np.sum(gammas, axis=0)
+        A = np.sum(epsilons, axis=0) / den[:, None]
+        A = A / np.sum(A, axis=1)[:,None]
+        for i in range(N):
+            nom = np.zeros(N)
+            for j in range(t):
+                if observ[j]-1==i:
+                    nom += gammas[j]
+            B[i] = nom/den
+        B = np.transpose(B)
+        B = B / np.sum(B, axis=1)[:, None]
+    return (A,B,pi)
+
 def main():
     # A = [[0.0, 0.3, 0.4, 0.3],
          # [0.0, 0.8, 0.1, 0.1],
@@ -229,7 +264,13 @@ def main():
     for i in path:
         print 'h%d->' % i,
     print '\b\b\b'
+    print '-> Most likely hidden path (using greedy) is: '
     print greedy(theta, observ)
+    print '-> estimate parameters:'
+    observ = [1,1,1,1,1,2,2,1,1,1]
+    newtheta = BaumWelch(observ, 2, 2)
+    for i in newtheta:
+        print i
 
 if __name__ == '__main__':
     main()
