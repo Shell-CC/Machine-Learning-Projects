@@ -172,7 +172,7 @@ def viterbi(theta, observ):
     argmaxMu = np.zeros((t, A.shape[0]))
     delta = pi * B[:, observ[0]]
     for i in range(1,t):
-        mu = np.transpose(A) * np.tile(delta, (3,1))
+        mu = np.transpose(A) * np.tile(delta, (A.shape[0],1))
         delta = B[:,observ[i]] * np.amax(mu, axis=1)
         argmaxMu[i] = np.argmax(mu, axis=1)
 
