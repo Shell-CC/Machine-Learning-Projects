@@ -6,6 +6,7 @@
 import parseData as pd
 from random import sample
 import numpy as np
+from matplotlib import pyplot as plt
 
 def cluster(X, k):
     """assign data X into k clusters
@@ -20,15 +21,15 @@ def cluster(X, k):
     clust: list of k cluster of data
     """
     X = np.asarray(X)
-    clust = kmeans(X, k)
-    return clust
+    y = kmeans(X, k)
+    return y
 
 def kmeans(X, k):
     # This algorithm converges to a local minimal
     numX = X.shape[0]
     # random select k points as clustering centroids
     centroids = np.asarray(sample(X, k))
-    # while cluaster changed
+    # while cluster changed
     clusterChanged = True
     while clusterChanged:
         clusterChanged = False
@@ -46,7 +47,7 @@ def kmeans(X, k):
                     minDist[j] = dist[j]
                     labels[j] = i
         # update the centroids
-        print centroids
+        # print centroids
         oldCentroids = centroids.copy()
         clusters = [[] for i in range(k)]
         for i in range(numX):
@@ -62,7 +63,16 @@ def kmeans(X, k):
 def main():
     X = pd.textAsFloat('../testData/testKMeans.txt', None, '\t')
     clusters = cluster(X, 4)
-    # print clusters
+    c0 = np.asarray(clusters[0])
+    c1 = np.asarray(clusters[1])
+    c2 = np.asarray(clusters[2])
+    c3 = np.asarray(clusters[3])
+    plt.plot(c0[:,0], c0[:,1], 'ob',
+             c1[:,0], c1[:,1], 'or',
+             c2[:,0], c2[:,1], 'og',
+             c3[:,0], c3[:,1], 'oy')
+    plt.show()
+    # print clusters[1]
 
 if __name__ == '__main__':
     main()
