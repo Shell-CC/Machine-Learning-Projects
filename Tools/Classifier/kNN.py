@@ -35,9 +35,9 @@ def classify(X, model):
     yhat:  the predicted labels of the data.
     """
     n = len(X)
-    yhat = np.zeros((n,1))
+    yhat = np.empty(n, dtype=int)
     for i in range(n):
-        yhat[i] = kNN(model[0], model[1], X[i], model[2])
+        yhat[i] = (int)(kNN(model[0], model[1], X[i], model[2]))
     return yhat
 
 def test(Xtest, ytest, model):
@@ -66,7 +66,7 @@ def kNN(Xtrain, ytrain, Xtest, k):
     """Given a new data, find the label,
     which is the k nearest neighbors in the trainning set
     """
-    ytrain = np.transpose(ytrain)[0]
+    # ytrain = np.transpose(ytrain)[0]
     # calculate the eclidian distacne between the test data and all train data
     XDiff = np.tile(Xtest, (Xtrain.shape[0], 1)) - Xtrain
     dist = (XDiff**2).sum(axis=1)
