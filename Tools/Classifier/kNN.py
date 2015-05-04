@@ -34,10 +34,14 @@ def classify(X, model):
     -------
     yhat:  the predicted labels of the data.
     """
-    n = len(X)
-    yhat = np.empty(n, dtype=int)
-    for i in range(n):
-        yhat[i] = (int)(kNN(model[0], model[1], X[i], model[2]))
+    d=len(X.shape)
+    if d>1:
+        n = len(X)
+        yhat = np.empty(n, dtype=int)
+        for i in range(n):
+            yhat[i] = (int)(kNN(model[0], model[1], X[i], model[2]))
+    else:
+        yhat = (int)(kNN(model[0], model[1], X, model[2]))
     return yhat
 
 def test(Xtest, ytest, model):
