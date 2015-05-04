@@ -11,6 +11,11 @@ def showData(X, dim=2):
     plt.show()
     return None
 
+def plotDataWithLabel(X, y, K=None):
+    if K==None:
+        K=len(set(y))
+    return None
+
 def plotData(X, dim=2):
     X = np.asarray(X)
     D = X.shape[1]
