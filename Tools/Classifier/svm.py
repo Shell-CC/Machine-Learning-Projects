@@ -6,7 +6,7 @@ import parseData as pd
 import numpy as np
 from random import randint
 
-def train(Xtrain, ytrain):
+def train(Xtrain, ytrain, c):
     """Train the weights using SVM
 
     parameters
@@ -23,15 +23,26 @@ def train(Xtrain, ytrain):
     Xtrain = np.mat(Xtrain)
     # Xtrain = np.concatenate((np.ones((Xtrain.shape[0], 1)), Xtrain), axis=1)
     ytrain = np.mat(ytrain)
-    alphaList, b = simpleSMO(Xtrain, ytrain, 0.6, 0.001, 40)
-    return alphaList, b
+    (alphas, b) = simpleSMO(Xtrain, ytrain, c)
+    alphas = alphas[alphas>0]
+    print alphas
+    return alphas
 
-def classify():
-    return
+def classify(model, Xtest):
+    a = np.mat(model[0])
+    y = np.mat(Xtest) * a.T
+    y = np.asarray(y.T)[0] + model[1]
+    print y
+    y[y<0]=0
+    y[y>0]=1
+    yhat = map(int, y)
+    print yhat
+    return np.asarray(yhat)
+
 def test():
     return
 
-def simpleSMO(Xtrain, ytrain, C, toler, N=10000):
+def simpleSMO(Xtrain, ytrain, C, toler=0.001, N=1000):
     # simpliefied SMO algorithm for training SVM
     numAlphas = Xtrain.shape[0]
     alphaList = np.mat(np.zeros((numAlphas, 1)))
@@ -73,7 +84,7 @@ def simpleSMO(Xtrain, ytrain, C, toler, N=10000):
                     alphaList[j] = H
                 elif alphaList[j]<L:
                     alphaList[j] = L
-                if (abs(alphaList[j]-alphaJold)<0.00001):
+                if (abs(alphaList[j]-alphaJold)<0.0001):
                     continue
                 # update alpha i
                 alphaList[i] += ytrain[j]*ytrain[i]*(alphaJold-alphaList[j])
@@ -109,9 +120,7 @@ def main():
     # Xtrain, ytrain = pd.textAsFloat('../testData/bclass-train', 0, '\t')
     # Xtest, ytest = pd.textAsFloat('../testData/bclass-test', 0, '\t')
     Xtrain, ytrain = pd.textAsFloat('../testData/testSMO.txt', -1, '\t')
-    alphas, b = train(Xtrain, ytrain)
-    print b
-    print alphas[alphas>0]
+    alphas, b = train(Xtrain, ytrain, 0.5)
 
 if __name__ == '__main__':
     main()
