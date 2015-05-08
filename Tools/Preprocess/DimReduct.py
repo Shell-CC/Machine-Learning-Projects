@@ -7,6 +7,15 @@ from norm import standardize
 from parseData import textAsFloat
 import numpy as np
 
+def selectFeat(X, dim, judge):
+    """ Select features using exhaustive search based on judgedment function
+
+    Parameters
+    ----------
+    X:   
+    """
+    return None
+
 def pca(dataset, k):
     """This is implementation of PCA
 
