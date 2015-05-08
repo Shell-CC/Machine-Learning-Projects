@@ -4,31 +4,73 @@ import numpy as np
 import Classifier.kNN as knn
 import Classifier.errorEstimator as err
 import Classifier.gda as gda
+# import Classifier.svm as svm
+from sklearn import svm
 from itertools import combinations
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def main():
     (Xtrain, ytrain, IDtrain, names) = readData('Training_Data.txt')
-    # selectResubExaus(Xtrain, ytrain, 'knn')
-    # selectLooExaus(Xtrain, ytrain, 'knn')
-    # selectResubForward(Xtrain, ytrain, 'knn')
-    # selectLooForward(Xtrain, ytrain, 'knn')
+    (Xtest, ytest, IDtest, names) = readData('Testing_Data.txt')
 
-    # selectResubExaus(Xtrain, ytrain, 'dlda')
+    print 'Classification rule: 3NN'
+    selectResubExaus(Xtrain, ytrain, 'knn')
+    selectResubForward(Xtrain, ytrain, 'knn')
+    selectLooExaus(Xtrain, ytrain, 'knn')
+    selectLooForward(Xtrain, ytrain, 'knn')
+    knnSets = [(12,),(7,66),(1,8,49),(12,),(12,22),(5,12,22),(5,12,22,24),(5,12,22,24,35), (49,), (7,66), (2,37,64), (49,), (37, 49), (24,37,49), (8,24,37,49), (5,8,24,37,49)]
+    for subset in knnSets:
+        subs = [item - 1 for item in subset]
+        subXtrain = exaustiveSearch(Xtrain, subs)
+        subXtest = exaustiveSearch(Xtest, subs)
+        model = knn.train(subXtrain, ytrain,3)
+        yhat = knn.classify(subXtest, model)
+        error = err.resub(ytest, yhat)
+        print '-> The test error for %s is %f' % (list(subset), error)
+
+    print 'Classification rule: DLDA'
+    selectResubExaus(Xtrain, ytrain, 'dlda')
+    selectResubForward(Xtrain, ytrain, 'dlda')
     selectLooExaus(Xtrain, ytrain, 'dlda')
-    # selectResubForward(Xtrain, ytrain, 'dlda')
-    # selectLooForward(Xtrain, ytrain, 'dlda')
+    selectLooForward(Xtrain, ytrain, 'dlda')
+    dldaSets = [(12,),(57,66),(12,20,33),(12,),(12,20),(12,20,33),(12,16,20,33),(12,16,19,20,33),(12,),(57,66),(2,60,66),(12,),(12,18),(12,18,24),(12,18,23,24),(12,13,18,23,24)]
+    for subset in dldaSets:
+        subs = [item - 1 for item in subset]
+        subXtrain = exaustiveSearch(Xtrain, subs)
+        subXtest = exaustiveSearch(Xtest, subs)
+        model = gda.ldatrain(subXtrain, ytrain)
+        yhat = gda.ldaclassify(model, subXtest)
+        error = err.resub(ytest, yhat)
+        print '-> The test error for %s is %f' % (list(subset), error)
 
-    # subX = exaustiveSearch(Xtrain, (11,19))
+    print 'Classification rule: SVM (c=0.5)'
+    selectResubExaus(Xtrain, ytrain, 'svm')
+    selectResubForward(Xtrain, ytrain, 'svm')
+    selectLooExaus(Xtrain, ytrain, 'svm')
+    selectLooForward(Xtrain, ytrain, 'svm')
+    svmSets = [(49,),(60,66),(23,60,66),(49,),(21,49),(5,21,49),(5,6,21,49),(5,6,10,21,49),(49,),(60,66),(3,14,57),(49,),(41,49),(28,41,49),(28,41,49,55),(5,28,41,49,55)]
+    for subset in svmSets:
+        subs = [item - 1 for item in subset]
+        subXtrain = exaustiveSearch(Xtrain, subs)
+        subXtest = exaustiveSearch(Xtest, subs)
+        model = svm.LinearSVC(C=0.5)
+        model.fit(subXtrain, ytrain)
+        yhat = model.predict(subXtest)
+        error = err.resub(ytest, yhat)
+        print '-> The test error for %s is %f' % (list(subset), error)
+
     # plt.figure(1)
     # plot(subX, ytrain)
+    # clf = svm.LinearSVC(C=0.5)
+    # clf.fit(subX, ytrain)
+    # yhat = clf.predict(subX)
     # model = gda.ldatrain(subX, ytrain)
     # yhat = gda.ldaclassify(model, subX)
     # print err.resub(ytrain, yhat)
     # plt.figure(2)
     # plot(subX, yhat)
     # plt.show()
-    (Xtest, ytest, IDtest, names) = readData('Testing_Data.txt')
 
 def readData(filename):
     X = []; labels = []; IDs =[]
@@ -62,15 +104,19 @@ def selectResubExaus(Xtrain, ytrain, method):
             elif method=='dlda':
                 model = gda.ldatrain(subX, ytrain)
                 yhat = gda.ldaclassify(model, subX)
+            elif method=='svm':
+                model = svm.LinearSVC(C=0.5)
+                model.fit(subX, ytrain)
+                yhat = model.predict(subX)
             error = err.resub(ytrain, yhat)
             if error < minErr:
                 bestSubsets = np.asarray(subsets) + 1
                 minErr = error
-        print 'the best susbsets with %d features is %s, with error %f' % (r, bestSubsets, minErr)
+        print '-> the optimal %d features is %s, with resubstitution %f' % (r, bestSubsets.tolist(), minErr)
     return None
 
 def selectLooExaus(Xtrain, ytrain, method):
-    """ Select 1-3 feature using exhaustive search based on leave-one-out error of 3nn
+    """ Select 1-3 feature using exhaustive search based on leave-one-out error
     """
     feats = range(Xtrain.shape[1])
     featNum = [1, 2, 3]
@@ -90,16 +136,20 @@ def selectLooExaus(Xtrain, ytrain, method):
                 elif method=='dlda':
                     model = gda.ldatrain(modelX, modelY)
                     yhat[i] = gda.ldaclassify(model, Xtest)
+                elif method=='svm':
+                    model = svm.LinearSVC(C=0.5)
+                    model.fit(modelX, modelY)
+                    yhat[i] = model.predict(Xtest)
             error = err.resub(ytrain, yhat)
             if error < minErr:
                 bestSubsets = np.asarray(subsets) + 1
                 minErr = error
-        print 'the best susbsets with %d features is %s, with error %f' % (r, bestSubsets.tolist(), minErr)
+        print '-> the optimal %d features is %s, with leave-one-out error %f' % (r, bestSubsets.tolist(), minErr)
     return None
 
 def selectResubForward(Xtrain, ytrain, method, maxFeatNum=5):
     """ Select 1-5 feature using forward search based on resubstitutions
-        of 3NN/DLDA/
+        of 3NN/DLDA/SVM
     """
     D = Xtrain.shape[1]
     featSets = []
@@ -117,12 +167,16 @@ def selectResubForward(Xtrain, ytrain, method, maxFeatNum=5):
             elif method=='dlda':
                 model = gda.ldatrain(subX, ytrain)
                 yhat = gda.ldaclassify(model, subX)
+            elif method=='svm':
+                model = svm.LinearSVC(C=0.5)
+                model.fit(subX, ytrain)
+                yhat = model.predict(subX)
             error = err.resub(ytrain, yhat)
             if error < minErr:
                 bestSubsets = np.asarray(subsets)+1
                 minErr = error
         featSets = (bestSubsets-1).tolist()
-        print 'the best susbsets with %d features is %s, with error %f' % (i+1, bestSubsets.tolist(), minErr)
+        print '-> the sub-optimal %d features is %s, with rebustitution %f' % (i+1, bestSubsets.tolist(), minErr)
     return None
 
 def selectLooForward(Xtrain, ytrain, method, maxFeatNum=5):
@@ -151,12 +205,16 @@ def selectLooForward(Xtrain, ytrain, method, maxFeatNum=5):
                 elif method=='dlda':
                     model = gda.ldatrain(modelX, modelY)
                     yhat[k] = gda.ldaclassify(model, Xtest)
+                elif method=='svm':
+                    model = svm.LinearSVC(C=0.5)
+                    model.fit(modelX, modelY)
+                    yhat[k] = model.predict(Xtest)
             error = err.resub(ytrain, yhat)
             if error < minErr:
                 bestSubsets = np.asarray(subsets)+1
                 minErr = error
         featSets = (bestSubsets-1).tolist()
-        print 'the best susbsets with %d features is %s, with error %f' % (i+1, bestSubsets.tolist(), minErr)
+        print '-> the sub-optimal %d features is %s, with leave-one-out error %f' % (i+1, bestSubsets.tolist(), minErr)
     return None
 
 def exaustiveSearch(X, subsets):
@@ -173,9 +231,12 @@ def plot(X, labels, K=2):
     N = len(X)
     for i in range(N):
         clusters[labels[i]].append(X[i].tolist())
+    # fig = plt.figure(1)
+    # ax = fig.add_subplot(111, projection='3d')
     for k in range(K):
         c = np.asarray(clusters[k])
         plt.plot(c[:,0], c[:,1], colors[k])
+        # ax.scatter(c[:,0], c[:,1], c[:,2], c=colors[k][1])
     return None
 
 if __name__ == '__main__':
