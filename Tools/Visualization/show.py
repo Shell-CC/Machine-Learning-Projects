@@ -16,6 +16,19 @@ def plotDataWithLabel(X, y, K=None):
         K=len(set(y))
     return None
 
+def plot1DwithLabel(X, y, K=None):
+    if K==None:
+        K = len(set(y))
+    colors = ['ob', 'or', 'og', 'oc', 'om', '^b', '^r', '^g', '^c', '^m']
+    clusters = [[] for _ in xrange(K)]
+    N = len(X)
+    for i in range(N):
+        clusters[y[i]].append([i, X[i]])
+    for k in range(K):
+        c = np.asarray(clusters[k])
+        plt.plot(c[:,0], c[:,1], colors[k])
+    return None
+
 def plotData(X, dim=2):
     X = np.asarray(X)
     D = X.shape[1]
