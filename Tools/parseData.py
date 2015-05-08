@@ -1,3 +1,4 @@
+import csv
 
 def textAsString(filename, axis, splitter=' '):
     """Read from a text file and parse each train data as a list of string
@@ -59,6 +60,24 @@ def textAsFloat(filename, axis, splitter=' '):
             X.append(data)
     f.close
     if axis==None:
+        return X
+    else:
+        return X,y
+
+def csvAsString(filename, yaxis=None):
+    with open(filename, 'rU') as f:
+        reader = csv.reader(f)
+        idList = []; X = []; y = [];
+        reader.next()
+        for line in reader:
+            if yaxis==None:
+                idList.append(int(line[0]))
+                X.append(line[1:])
+            else:
+                idList.append(int(line[0]))
+                X.append(line[1:-1])
+                y.append(float(line[yaxis]))
+    if yaxis==None:
         return X
     else:
         return X,y
