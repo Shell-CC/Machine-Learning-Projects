@@ -11,8 +11,6 @@ import ModelSelection.errorEstimator as err
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from sklearn.naive_bayes import BernoulliNB
-from sklearn import svm
 from sklearn.cluster import KMeans
 from sklearn.cross_validation import LeaveOneOut
 
@@ -28,12 +26,12 @@ def main():
     # rvDomain(years+years2, cities+cities2, groups+groups2, types+types2, P, True)
     # rvDistrib(years+years2, cities+cities2, groups+groups2, types+types2, P, True)
 
-    # kNNReg(Xtrain, ytrain, Xtest, 'kNNRegHalf.csv', [0,1,2,3,4,5])
-    # kNNReg(Xtrain, ytrain, Xtest, 'kNNRegAll.csv', 'all')
+    kNNReg(Xtrain, ytrain, Xtest, 'kNNRegHalf.csv', [0,1,2,3,4,5])
+    kNNReg(Xtrain, ytrain, Xtest, 'kNNRegAll.csv', 'all')
 
-    # treeReg(Xtrain, ytrain, Xtest, 'treeReg.csv')
+    treeReg(Xtrain, ytrain, Xtest, 'treeReg.csv')
 
-    # cpp(Xtrain, ytrain, Xtest, 'cpp_tree.csv', DecisionTreeClassifier(),5)
+    cpp(Xtrain, ytrain, Xtest, 'cpp_tree.csv', DecisionTreeClassifier(),5)
 
     chooseClassify(Xtrain, ytrain, Xtest)
 
