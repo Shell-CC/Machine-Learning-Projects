@@ -8,6 +8,7 @@ implementaion of basic and most popular machine learning models, including:
 + logistic regression: gradient descent  
 + decision tree: ID3 algorithm  
 + naive bayes  
++ SVM: SMO
 
 *Predictor*  
 + linear regression: normal equation  
