@@ -19,9 +19,11 @@ implementaion of basic and most popular machine learning models, including:
 *Pre-processor*  
 + standardization  
 + normalization: L1 norm, L2 norm  
++ Dimension reduction: PCA, Exhaustive-search selection  
++ Encoder: one-hot encoding  
 
 *Model Selection*  
-+ Error estimator: resubstitutions  
++ Error estimator: resubstitutions, leave-one-out cross-validation  
 
 *HMM*  
 + Probability estimation: forward-backward algorithm  
