@@ -8,7 +8,6 @@ implementaion of basic and most popular machine learning models, including:
 + logistic regression: gradient descent  
 + decision tree: ID3 algorithm  
 + naive bayes  
-+ Error estimator: resubstitutions  
 
 *Predictor*  
 + linear regression: normal equation  
@@ -20,6 +19,9 @@ implementaion of basic and most popular machine learning models, including:
 *Pre-processor*  
 + standardization  
 + normalization: L1 norm, L2 norm  
+
+*Model Selection*  
++ Error estimator: resubstitutions  
 
 *HMM*  
 + Probability estimation: forward-backward algorithm  
